@@ -31,6 +31,9 @@ bot_init = function() -- The function run when the bot is started or reloaded.
 	-- Generate a random seed and "pop" the first random number. :)
 	math.randomseed(os.time())
 	math.random()
+	math.random()
+	math.random()
+	math.random()
 
 	last_update = last_update or 0 -- Set loop variables: Update offset,
 	last_cron = last_cron or os.date('%M', os.time()) -- the time of the last cron job,

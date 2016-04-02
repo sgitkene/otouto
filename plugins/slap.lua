@@ -89,7 +89,28 @@ local slaps = {
 	'VICTOR slaps VICTIM with a DMCA takedown request!',
 	'VICTIM became a corpse blanket for VICTOR.',
 	'Death is when the monsters get you. Death comes for VICTIM.',
-	'Cowards die many times before their death. VICTIM never tasted death but once.'
+	'Cowards die many times before their death. VICTIM never tasted death but once.',
+	'VICTOR developped an algorithm that slaps VICTIM in O(1).',
+	'VICTOR slaps VICTIM with a figurine of VICTOR slapping VICTIM.',
+	'VICTOR slaps VICTIM with a figurine of VICTIM.',
+	'VICTOR threw VICTIM in a room full of spiders.',
+	'VICTOR dared VICTIM to play a game of FNaF. They were scared shitless and died, literally.',
+	'I slapped VICTIM for VICTOR.',
+	'The floor trembles as VICTIM hits the floor, defeated by VICTOR!',
+	'VICTOR breaks a bottle on VICTIM \'s head.',
+	'VICTOR slaps VICTIM with a Windows Update.',
+	'VICTOR hits VICTIM with a small interstellar spaceship.',
+	'VICTOR slaps VICTIM around a bit with a large trout.',
+	'VICTOR stabs VICTIM with a key.',
+	'VICTOR strangles VICTIM with a power cable.',
+	'VICTOR penetrated VICTIM.',
+	'VICTOR resetted VICTIM.',
+	'VICTOR devoured VICTIM.',
+	'VICTIM forgot to pull out.',
+	'VICTIM fell out of the world',
+	'VICTIM is now only two dimensional.',
+	'VICTOR won\'t put up with VICTIM anymore.',
+	'VICTOR had their way with VICTIM.'
 }
 
 local action = function(msg)
