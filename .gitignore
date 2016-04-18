@@ -1,6 +1,8 @@
 plugins/mokubot*
 plugins/qtbot*
-plugins/weeabot*
+plugins/mjolnir*
+plugins/antisquigbot*
 *.db
 lua-tg
+drua-tg
 tg

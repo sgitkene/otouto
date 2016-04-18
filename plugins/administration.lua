@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.7
+	Version 1.8.1
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -17,6 +17,11 @@
 	("antisquig Strict" -> "antisquig++"). Added /alist for governors to list
 	administrators. Back to single-governor groups as originally intended. Auto-
 	matic migration through 1.8.
+
+	1.8 - Group descriptions will be updated automatically. Fixed markdown
+	stuff. Removed /kickme.
+
+	1.8.1 - /rule <i> will return that numbered rule, if it exists.
 
 ]]--
 
@@ -166,8 +171,7 @@ end
 local mod_format = function(id)
 	id = tostring(id)
 	local user = database.users[id] or { first_name = 'Unknown' }
-	local name = user.first_name
-	if user.last_name then name = user.first_name .. ' ' .. user.last_name end
+	local name = build_name(user.first_name, user.last_name)
 	name = markdown_escape(name)
 	local output = '• ' .. name .. ' `[' .. id .. ']`\n'
 	return output
@@ -201,6 +205,11 @@ local get_desc = function(chat_id)
 	if flaglist ~= '' then
 		table.insert(t, '*Flags:*\n' .. flaglist:trim())
 	end
+	if group.governor then
+		local gov = database.users[tostring(group.governor)]
+		local s = build_name(gov.first_name, gov.last_name):md_escape() .. ' `[' .. gov.id .. ']`'
+		table.insert(t, '*Governor:* ' .. s)
+	end
 	local modstring = ''
 	for k,v in pairs(group.mods) do
 		modstring = modstring .. mod_format(k)
@@ -208,13 +217,21 @@ local get_desc = function(chat_id)
 	if modstring ~= '' then
 		table.insert(t, '*Moderators:*\n' .. modstring:trim())
 	end
-	if group.governor then
-		local gov = database.users[tostring(group.governor)]
-		local s = build_name(gov.first_name, gov.last_name):md_escape() .. ' `[' .. gov.id .. ']`'
-		table.insert(t, '*Governor:* ' .. s)
-	end
 	return table.concat(t, '\n\n')
 
+end
+
+update_desc = function(chat)
+	local group = database.administration.groups[tostring(chat)]
+	local desc = 'Welcome to ' .. group.name .. '!\n'
+	if group.motd then desc = desc .. group.motd .. '\n' end
+	if group.governor then
+		local gov = database.users[tostring(group.governor)]
+		desc = desc .. '\nGovernor: ' .. build_name(gov.first_name, gov.last_name) .. ' [' .. gov.id .. ']\n'
+	end
+	local s = '\n/desc@' .. bot.username .. ' for more information.'
+	desc = desc:sub(1, 250-s:len()) .. s
+	drua.channel_set_about(chat, desc)
 end
 
 local commands = {
@@ -237,6 +254,9 @@ local commands = {
 				return true
 			end
 			drua.kick_user(msg.chat.id, msg.from.id)
+			if msg.chat.type == 'supergroup' then
+				unbanChatMember(msg.chat.id, msg.from.id)
+			end
 			local output = flags[2].kicked:gsub('GROUPNAME', msg.chat.title)
 			sendMessage(msg.from.id, output)
 		end
@@ -265,6 +285,9 @@ local commands = {
 				if group.flags[3] == true then
 					if msg.from.name:match('[\216-\219][\128-\191]') or msg.from.name:match('‮') or msg.from.name:match('‏') then
 						drua.kick_user(msg.chat.id, msg.from.id)
+						if msg.chat.type == 'supergroup' then
+							unbanChatMember(msg.chat.id, msg.from.id)
+						end
 						local output = flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
 						sendMessage(msg.from.id, output)
 						return
@@ -303,6 +326,9 @@ local commands = {
 					end
 					if admin_temp.flood[msg.chat.id_str][msg.from.id_str] > 99 then
 						drua.kick_user(msg.chat.id, msg.from.id)
+						if msg.chat.type == 'supergroup' then
+							unbanChatMember(msg.chat.id, msg.from.id)
+						end
 						local output = flags[5].kicked:gsub('GROUPNAME', msg.chat.title)
 						sendMessage(msg.from.id, output)
 						admin_temp.flood[msg.chat.id_str][msg.from.id_str] = nil
@@ -314,10 +340,7 @@ local commands = {
 
 			if msg.new_chat_participant then
 
-				msg.new_chat_participant.name = msg.new_chat_participant.first_name
-				if msg.new_chat_participant.last_name then
-					msg.new_chat_participant.name = msg.new_chat_participant.first_name .. ' ' .. msg.new_chat_participant.last_name
-				end
+				msg.new_chat_participant.name = build_name(msg.new_chat_participant.first_name, msg.new_chat_participant.last_name)
 
 				-- banned
 				if get_rank(msg.new_chat_participant.id, msg.chat.id) == 0 then
@@ -330,6 +353,9 @@ local commands = {
 				if group.flags[3] == true then
 					if msg.new_chat_participant.name:match('[\216-\219][\128-\191]') or msg.new_chat_participant.name:match('‮') or msg.new_chat_participant.name:match('‏') then
 						drua.kick_user(msg.chat.id, msg.new_chat_participant.id)
+						if msg.chat.type == 'supergroup' then
+							unbanChatMember(msg.chat.id, msg.from.id)
+						end
 						local output = flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
 						sendMessage(msg.new_chat_participant.id, output)
 						return
@@ -354,6 +380,9 @@ local commands = {
 					drua.rename_chat(msg.chat.id, group.name)
 				else
 					group.name = msg.new_chat_title
+					if group.grouptype == 'supergroup' then
+						update_desc(msg.chat.id)
+					end
 				end
 				return
 
@@ -515,8 +544,8 @@ local commands = {
 
 	{ -- rules
 		triggers = {
-			'^/rules$',
-			'^/rules@'..bot.username
+			'^/rules?',
+			'^/rules?@'..bot.username
 		},
 
 		command = 'rules',
@@ -524,12 +553,20 @@ local commands = {
 		interior = true,
 
 		action = function(msg, group)
-			local output = 'No rules have been set for ' .. msg.chat.title .. '.'
+			local output
+			local input = get_word(msg.text_lower, 2)
+			input = tonumber(input)
 			if #group.rules > 0 then
-				output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n'
-				for i,v in ipairs(group.rules) do
-					output = output .. '*' .. i .. '.* ' .. v .. '\n'
+				if input and group.rules[input] then
+					output = '*' .. input .. '.* ' .. group.rules[input]
+				else
+					output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n'
+					for i,v in ipairs(group.rules) do
+						output = output .. '*' .. i .. '.* ' .. v .. '\n'
+					end
 				end
+			else
+				output = 'No rules have been set for ' .. msg.chat.title .. '.'
 			end
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -573,29 +610,6 @@ local commands = {
 		end
 	},
 
-	{ -- kickme
-		triggers = {
-			'^/leave[@'..bot.username..']*',
-			'^/kickme[@'..bot.username..']*'
-		},
-
-		command = 'leave',
-		privilege = 1,
-		interior = true,
-
-		action = function(msg)
-			if get_rank(msg.from.id) == 5 then
-				local output = 'I can\'t let you do that, ' .. msg.from.first_name .. '.'
-				sendMessage(msg.chat.id, output, true, nil, true)
-			elseif msg.chat.type == 'supergroup' then
-				local output = 'Leave this group manually or you will be unable to rejoin.'
-				sendMessage(msg.chat.id, output, true, nil, true)
-			else
-				drua.kick_user(msg.chat.id, msg.from.id)
-			end
-		end
-	},
-
 	{ -- kick
 		triggers = {
 			'^/kick[@'..bot.username..']*'
@@ -615,6 +629,9 @@ local commands = {
 				return
 			end
 			drua.kick_user(msg.chat.id, target.id)
+			if msg.chat.type == 'supergroup' then
+				unbanChatMember(msg.chat.id, target.id)
+			end
 			sendMessage(msg.chat.id, target.name .. ' has been kicked.')
 		end
 	},
@@ -753,15 +770,19 @@ local commands = {
 					sendReply(msg, 'Please specify the new message of the day.')
 					return
 				end
-			elseif input == '--' or input == '—' then
+			end
+			if input == '--' or input == '—' then
 				group.motd = nil
 				sendReply(msg, 'The MOTD has been cleared.')
-				return
+			else
+				input = input:trim()
+				group.motd = input
+				local output = '*MOTD for* _' .. msg.chat.title .. '_ *:*\n' .. input
+				sendMessage(msg.chat.id, output, true, nil, true)
 			end
-			input = input:trim()
-			group.motd = input
-			local output = '*MOTD for* _' .. msg.chat.title .. '_ *:*\n' .. input
-			sendMessage(msg.chat.id, output, true, nil, true)
+			if group.grouptype == 'supergroup' then
+				update_desc(msg.chat.id)
+			end
 		end
 	},
 
@@ -939,7 +960,7 @@ local commands = {
 				if group.grouptype == 'supergroup' then
 					drua.channel_set_admin(msg.chat.id, target.id, 0)
 				end
-				group.governor = nil
+				group.governor = config.admin
 				sendReply(msg, target.name .. ' is no longer the governor.')
 			else
 				if group.grouptype == 'supergroup' then
@@ -953,6 +974,9 @@ local commands = {
 				end
 				group.governor = target.id
 				sendReply(msg, target.name .. ' is the new governor.')
+			end
+			if group.grouptype == 'supergroup' then
+				update_desc(msg.chat.id)
 			end
 		end
 	},
@@ -1050,6 +1074,10 @@ local commands = {
 				photo = drua.get_photo(msg.chat.id),
 				founded = os.time()
 			}
+			update_desc(msg.chat.id)
+			for i = 1, #flags do
+				database.administration.groups[msg.chat.id_str].flags[i] = false
+			end
 			table.insert(database.administration.activity, msg.chat.id_str)
 			sendReply(msg, 'I am now administrating this group.')
 		end
@@ -1098,7 +1126,7 @@ local commands = {
 					output = output .. '[' .. v.name:md_escape() .. '](' .. v.link .. ') `[' .. k .. ']`\n'
 					if v.governor then
 						local gov = database.users[tostring(v.governor)]
-						output = output .. '• Governor: ' .. build_name(gov.first_name, gov.last_name):md_escape() .. ' `[' .. gov.id .. ']`\n'
+						output = output .. '★ ' .. build_name(gov.first_name, gov.last_name):md_escape() .. ' `[' .. gov.id .. ']`\n'
 					end
 				end
 			else
