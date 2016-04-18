@@ -16,7 +16,7 @@ return {
 	cli_port = 4567,
 	admin = 18639698,
 	admin_name = 'Sgit Kene',
-	log_chat = nil,
+	log_chat = 134058832,
 	about_text = [[
 I am sgitbot, the plugin-wielding, multi-purpose Telegram bot.
 
