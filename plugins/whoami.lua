@@ -14,29 +14,38 @@ local action = function(msg)
 		msg = msg.reply_to_message
 	end
 
-	local from_name = msg.from.first_name
 	if msg.from.last_name then
-		from_name = from_name .. ' ' .. msg.from.last_name
-	end
-	if msg.from.username then
-		from_name = '@' .. msg.from.username .. ', AKA ' .. from_name
-	end
-	from_name = from_name .. ' (' .. msg.from.id .. ')'
-
-	local to_name
-	if msg.chat.title then
-		to_name = msg.chat.title .. ' (' .. math.abs(msg.chat.id) .. ').'
+		msg.from.name = msg.from.first_name .. ' ' .. msg.from.last_name
 	else
-		to_name = '@' .. bot.username .. ', AKA ' .. bot.first_name .. ' (' .. bot.id .. ').'
+		msg.from.name = msg.from.first_name
 	end
 
-	local message = 'You are ' .. from_name .. ' and you are messaging ' .. to_name
-
-	if database.nicknames[msg.from.id_str] then
-		message = message .. '\nYour nickname is ' .. database.nicknames[msg.from.id_str] .. '.'
+	local chat_id = math.abs(msg.chat.id)
+	if chat_id > 1000000000000 then
+		chat_id = chat_id - 1000000000000
 	end
 
-	sendReply(msg, message)
+	local user = 'You are @%s, also known as *%s* `[%s]`'
+	if msg.from.username then
+		user = user:format(markdown_escape(msg.from.username), msg.from.name, msg.from.id)
+	else
+		user = 'You are *%s* `[%s]`,'
+		user = user:format(msg.from.name, msg.from.id)
+	end
+
+	local group = '@%s, also known as *%s* `[%s]`.'
+	if msg.chat.type == 'private' then
+		group = group:format(markdown_escape(bot.username), bot.first_name, bot.id)
+	elseif msg.chat.username then
+		group = group:format(markdown_escape(msg.chat.username), msg.chat.title, chat_id)
+	else
+		group = '*%s* `[%s]`.'
+		group = group:format(msg.chat.title, chat_id)
+	end
+
+	local output = user .. ', and you are messaging ' .. group
+
+	sendMessage(msg.chat.id, output, true, msg.message_id, true)
 
 end
 

@@ -1,11 +1,22 @@
 # otouto
 The plugin-wielding, multipurpose Telegram bot.
 
-[Public Bot](http://telegram.me/mokubot) | [Official Channel](http://telegram.me/otouto) | [Development Group](http://telegram.me/BotDevelopment) | [Owner's Manual](http://otou.to/rtfm)
+[Public Bot](http://telegram.me/mokubot) | [Official Channel](http://telegram.me/otouto) | [Development Group](http://telegram.me/BotDevelopment)
 
 otouto is an independently-developed Telegram API bot written in Lua. Originally conceived as a CLI script in February of 2015, otouto has since been open-sourced and migrated to the API, and is being developed to this day.
 
-## Setup {#Setup}
+| The Manual |
+|:-----------|
+| [Setup](#setup) |
+| [Plugins](#plugins) |
+| [Control plugins](#control-plugins) |
+| [administration.lua](#administrationlua) |
+| [Liberbot-related plugins](#liberbot-related-plugins) |
+| [List of plugins](#list-of-plugins) |
+| [Style](#style) |
+| [Contributors](#contributors) |
+
+## Setup
 You _must_ have Lua (5.2+), lua-socket, lua-sec, and lua-cjson installed. To upload files, you must have curl installed. To use fortune.lua, you must have fortune installed.
 
 **Before doing anything**, open config.lua and set `bot_api_key` to the authentication token you received from the Botfather.
@@ -28,7 +39,7 @@ Note that certain plugins, such as translate.lua and greetings.lua, will require
 
 * * *
 
-## Plugins {#Plugins}
+## Plugins
 otouto uses a robust plugin system, similar to that of yagop's [Telegram-Bot](http://github.com/yagop/telegram-bot). The aim of the otouto project is to contain any desirable bot feature within one universal bot framework.
 
 Most plugins are intended for public use, but a few are for other purposes, like those used alongside [Liberbot](#Liberbot-related_plugins), or for [use by the bot's owner](#Control_plugins). See [Development](#Development) for a breakdown of the components of a plugin, or [here](#List_of_plugins) for a list of plugins.
@@ -55,7 +66,7 @@ Several functions used in multiple plugins are defined in utilities.lua. Refer t
 
 * * *
 
-## Control plugins {#Control_plugins}
+## Control plugins
 Some plugins are designed to be used by the bot's owner. Here are some examples, how they're used, and what they do.
 
 | Plugin | Command | Function |
@@ -68,7 +79,7 @@ Some plugins are designed to be used by the bot's owner. Here are some examples,
 
 * * *
 
-## administration.lua {#administration.lua}
+## administration.lua
 The administration plugin enables self-hosted, single-realm group administration, supporting both normal groups and supergroups. This works by sending TCP commands to an instance of tg running on the owner's account.
 
 To get started, run `./tg-install.sh`. Note that this script is written for Ubuntu/Debian. If you're running Arch (the only acceptable alternative), you'll have to do it yourself. If that is the case, note that otouto uses the "test" branch of tg, and the AUR package `telegram-cli-git` will not be sufficient, as it does not have support for supergroups yet.
@@ -95,6 +106,7 @@ While tg is running, you may start/reload otouto with administration.lua enabled
 | /setmotd | Sets a group's "Message of the Day". | 3 | Y |
 | /setlink | Sets a group's link. | 3 | Y |
 | /flag | Returns a list of available flags and their settings, or toggles a flag. | 3 | Y |
+| /antiflood | Configures antiflood (flag 5) settings. | 3 | Y |
 | /mod | Promotes a user to a moderator. | 3 | Y |
 | /demod | Demotes a moderator to a user. | 3 | Y |
 | /gov | Promotes a user to a governor. | 4 | Y |
@@ -130,10 +142,28 @@ Obviously, each greater rank inherits the privileges of the lower, positive rank
 | 2 | antisquig | Automatically removes users for posting Arabic script or RTL characters. |
 | 3 | antisquig Strict | Automatically removes users whose names contain Arabic script or RTL characters. |
 | 4 | antibot | Prevents bots from being added by non-moderators. |
+| 5 | antiflood | Prevents flooding by rate-limiting messages per user. |
+
+#### antiflood
+antiflood (flag 5) provides a system of automatic flood protection by removing users who post too much. It is entirely configurable by a group's governor, an administrator, or the bot owner. For each message to a particular group, a user is awarded a certain number of "points". The number of points is different for each message type. When the user reaches 100 points, he is removed. Points are reset each minute. In this way, if a user posts twenty messages within one minute, he is removed.
+
+**Default antiflood values:**
+
+| Type | Points |
+|:-----|:------:|
+| text | 5 |
+| contact | 5 |
+| audio | 5 |
+| voice | 5 |
+| photo | 10 |
+| document | 10 |
+| location | 10 |
+| video | 10 |
+| sticker | 20 |
 
 * * *
 
-# Liberbot-related plugins {#Liberbot-related_plugins}
+# Liberbot-related plugins
 **Note:** This section may be out of date. The Liberbot-related plugins have not changed in very long time.
 Some plugins are only useful when the bot is used in a Liberbot group, like floodcontrol.lua and moderation.lua.
 
@@ -160,55 +190,56 @@ Once this is set up, put your bot in the admin group and run `/modadd` and `/mod
 
 * * *
 
-## List of plugins {#List_of_plugins}
+## List of plugins
 
 | Plugin | Command | Function | Aliases |
 |:-------|:--------|:---------|:--------|
-| help.lua | /help | Returns a list of commands. | /h |
+| help.lua | /help [command] | Returns a list of commands or command-specific help. | /h |
 | about.lua | /about | Returns the about text as configured in config.lua. |
 | ping.lua | /ping | The simplest plugin ever! |
-| echo.lua | /echo <text> | Repeats a string of text. |
-| gSearch.lua | /google <query> | Returns Google web results. | /g, /gnsfw |
-| gImages.lua | /images <query> | Returns a Google image result. | /i, /insfw |
-| gMaps.lua | /location <query> | Returns location data from Google Maps. | /loc |
-| youtube.lua | /youtube <query> | Returns the top video result from YouTube. | /yt |
-| wikipedia.lua | /wikipedia <query> | Returns the summary of a Wikipedia article. | /wiki |
+| echo.lua | /echo &lt;text&gt; | Repeats a string of text. |
+| gSearch.lua | /google &lt;query&gt; | Returns Google web results. | /g, /gnsfw |
+| gImages.lua | /images &lt;query&gt; | Returns a Google image result. | /i, /insfw |
+| gMaps.lua | /location &lt;query&gt; | Returns location data from Google Maps. | /loc |
+| youtube.lua | /youtube &lt;query&gt; | Returns the top video result from YouTube. | /yt |
+| wikipedia.lua | /wikipedia &lt;query&gt; | Returns the summary of a Wikipedia article. | /wiki |
 | lastfm.lua | /np [username] | Returns the song you are currently listening to. |
 | lastfm.lua | /fmset [username] | Sets your username for /np. /fmset -- will delete it. |
 | hackernews.lua | /hackernews | Returns the latest posts from Hacker News. | /hn |
-| imdb.lua | /imdb <query> | Returns film information from IMDb. |
-| hearthstone.lua | /hearthstone <query> | Returns data for Hearthstone cards matching the query. | /hs |
-| calc.lua | /calc <expression> | Returns solutions to math expressions and conversions between common units. |
-| bible.lua | /bible <reference> | Returns a Bible verse. | /b |
-| urbandictionary.lua | /urbandictionary <query> | Returns the top definition from Urban Dictionary. | /ud, /urban |
-| time.lua | /time <query> | Returns the time, date, and a timezone for a location. |
-| weather.lua | /weather <query> | Returns current weather conditions for a given location. |
-| nick.lua | /nick <nickname> | Set your nickname. /nick - will delete it. |
+| imdb.lua | /imdb &lt;query&gt; | Returns film information from IMDb. |
+| hearthstone.lua | /hearthstone &lt;query&gt; | Returns data for Hearthstone cards matching the query. | /hs |
+| calc.lua | /calc &lt;expression&gt; | Returns solutions to math expressions and conversions between common units. |
+| bible.lua | /bible &lt;reference&gt; | Returns a Bible verse. | /b |
+| urbandictionary.lua | /urbandictionary &lt;query&gt; | Returns the top definition from Urban Dictionary. | /ud, /urban |
+| time.lua | /time &lt;query&gt; | Returns the time, date, and a timezone for a location. |
+| weather.lua | /weather &lt;query&gt; | Returns current weather conditions for a given location. |
+| nick.lua | /nick &lt;nickname&gt; | Set your nickname. /nick - will delete it. |
 | whoami.lua | /whoami | Returns user and chat info for you or the replied-to user. | /who |
 | eightball.lua | /8ball | Returns an answer from a magic 8-ball. |
-| dice.lua | /roll <nDr> | Returns RNG dice rolls. Uses D&D notation. |
+| dice.lua | /roll &lt;nDr&gt; | Returns RNG dice rolls. Uses D&D notation. |
 | reddit.lua | /reddit [r/subreddit ¦ query] | Returns the top results from a given subreddit, query, or r/all. | /r |
 | xkcd.lua | /xkcd [query] | Returns an xkcd strip and its alt text. |
-| slap.lua | /slap <target> | Gives someone a slap (or worse). |
+| slap.lua | /slap &lt;target&gt; | Gives someone a slap (or worse). |
 | commit.lua | /commit | Returns a commit message from whatthecommit.com. |
 | fortune.lua | /fortune | Returns a UNIX fortune. |
 | pun.lua | /pun | Returns a pun. |
-| pokedex.lua | /pokedex <query> | Returns a Pokedex entry. | /dex |
-| currency.lua | /cash [amount] <currency> to <currency> | Converts one currency to another. |
+| pokedex.lua | /pokedex &lt;query&gt; | Returns a Pokedex entry. | /dex |
+| currency.lua | /cash [amount] &lt;currency&gt; to &lt;currency&gt; | Converts one currency to another. |
 | cats.lua | /cat | Returns a cat picture. |
 | reactions.lua | /reactions | Returns a list of reaction emoticons which can be used through the bot. |
 | apod.lua | /apod [date] | Returns the NASA Astronomy Picture of the Day. |
 | dilbert.lua | /dilbert [date] | Returns a Dilbert strip. |
-| patterns.lua | /s/<from>/<to>/ | Fixed that for you. :^) |
+| patterns.lua | /s/&lt;from&gt;/&lt;to&gt;/ | Fixed that for you. :^) |
+| me.lua | /me | Returns user-specific data stored by the bot. |
 
 * * *
 
-## Style {#Style}
+## Style
 Bot output from every plugin should follow a consistent style. This style is easily observed interacting with the bot.
 Titles should be either **bold** (along with their colons) or a [link](http://otou.to) (with plaintext colons) to the content's source. Names should be _italic_. Numbered lists should use bold numbers followed by a bold period followed by a space. Unnumbered lists should use the • bullet point followed by a space. Descriptions and information should be in plaintext, although "flavor" text should be italic. Technical information should be `monospace`. Links should be named.
 
-## Contributors {#Contributors}
-Everybody is free to contribute to otouto. If you are interested, you are invited to fork the [repo](http://github.com/topkecleon/otouto) and start making pull requests.. If you have an idea and you are not sure how to implement it, open an issue or bring it up in the Bot Development group.
+## Contributors
+Everybody is free to contribute to otouto. If you are interested, you are invited to fork the [repo](http://github.com/topkecleon/otouto) and start making pull requests. If you have an idea and you are not sure how to implement it, open an issue or bring it up in the Bot Development group.
 
 The creator and maintainer of otouto is [topkecleon](http://github.com/topkecleon). He can be contacted via [Telegram](http://telegram.me/topkecleon), [Twitter](http://twitter.com/topkecleon), or [email](mailto:drew@otou.to).
 

@@ -4,7 +4,9 @@ if not database.hearthstone or os.time() > database.hearthstone.expiration then
 
 	print('Downloading Hearthstone database...')
 
-	database.hearthstone = {}
+	database.hearthstone = {
+		expiration = os.time() + 600000
+	}
 
 	local jstr, res = HTTPS.request('http://hearthstonejson.com/json/AllSets.json')
 	if res ~= 200 then
@@ -20,8 +22,6 @@ if not database.hearthstone or os.time() > database.hearthstone.expiration then
 		end
 	end
 
-	database.hearthstone.expiration = os.time() + 600000
-
 	print('Download complete! It will be stored for a week.')
 
 end
@@ -30,7 +30,7 @@ local command = 'hearthstone <query>'
 local doc = [[```
 /hearthstone <query>
 Returns Hearthstone card info.
-Alias: /hn
+Alias: /hs
 ```]]
 
 local triggers = {
