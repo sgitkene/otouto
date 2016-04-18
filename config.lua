@@ -119,6 +119,7 @@ Send /help to get started.
 		'cats.lua',
 --		'hearthstone.lua',
 		'newline.lua',
+		'reactions.lua',
 		'shout.lua',
 		'patterns.lua',
 		-- Put new plugins above this line.
