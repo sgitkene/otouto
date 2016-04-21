@@ -6,7 +6,7 @@ local triggers = {
 }
 
 local action = function(msg)
-	sendMessage(msg.chat.id, '.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n.')
+	sendMessage(msg.chat.id, '.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n.')
 end
 
 return {

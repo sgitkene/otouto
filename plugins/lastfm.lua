@@ -9,7 +9,7 @@ HTTP.TIMEOUT = 1
 
 local command = 'lastfm'
 local doc = [[```
-/np [username]
+/lm [username]
 Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
 
 /fmset <username>
@@ -18,7 +18,7 @@ Sets your last.fm username. Otherwise, /np will use your Telegram username. Use 
 
 local triggers = {
 	'^/lastfm[@'..bot.username..']*',
-	'^/np[@'..bot.username..']*',
+	'^/lm[@'..bot.username..']*',
 	'^/fmset[@'..bot.username..']*'
 }
 
