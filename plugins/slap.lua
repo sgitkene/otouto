@@ -24,7 +24,14 @@ local cuddles = {
 	'VICTOR kisses VICTIM amiably.',
 	'VICTOR strokes VICTIM\'s fur.',
 	'VICTOR looks deeply into VICTIM\'s bright eyes.',
-	'VICTOR looks at VICTIM. VICTIM looks back. VICTOR blushes and looks away.'
+	'VICTOR looks at VICTIM. VICTIM looks back. VICTOR blushes and looks away.',
+	'VICTOR floofs VICTIM with their soft fur.',
+	'VICTIM shudders as they get floofed softly.',
+	'VICTIM relaxes as they cuddle with VICTOR.',
+	'VICTIM can\'t get enough of VICTOR\'s cluddles.',
+	'VICTOR and VICTIM enjoy their time toghether.',
+	'VICTIM has been overfloofed.'
+
 }
 
 local slaps = {
