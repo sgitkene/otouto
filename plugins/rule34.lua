@@ -26,7 +26,7 @@ local action = function(msg)
 		print(input)
 		answer, status = HTTP.request(base_url..input..'/1')
 		if status ~= 200 then
-			output = config.errors.connection..'1'
+			output = config.errors.connection..'('..status..')'..base_url..input..'/1'
 		else
 			maxnum = answer:match('<a href=".-(%d*)">Last</a>')
 			if maxnum then
@@ -36,9 +36,9 @@ local action = function(msg)
 				maxnum = 1
 			end
 			print(maxnum)
-			answer, status = HTTP.request(base_url..input..'/'..randomint)
+			answer, status = HTTP.request(base_url..input..'/'..maxnum)
 			if status ~= 200 then
-				output = config.errors.connection..'2'
+				output = config.errors.connection..'2('..status..')'..base_url..input..'/'..maxnum
 			else
 				local temptable = {}
 				numbert = 1

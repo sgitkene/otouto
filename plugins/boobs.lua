@@ -3,17 +3,27 @@ local doc = [[```
 /boobs
 Returns a pic with nice boobs.
 Alias: /bo
+/butts
+Returns a pic with nice butts.
+Alias: /bu
 ```]]
 
 local triggers = {
 	'^/boobs[@'..bot.username..']*',
 	'^/bo[@'..bot.username..']*',
+	'^/bu[tts]?[@'..bot.username..']*'
 }
 
 
 local action = function(msg)
 
-	local jstr, status = HTTP.request('http://api.oboobs.ru/noise/1')
+	val = msg.text:match('bu')
+	if val == 'bu' then
+		val = 'butt'
+	else
+		val = 'boob'
+	end
+	local jstr, status = HTTP.request('http://api.o'..val..'s.ru/noise/1')
 	if status ~= 200 then
 		sendReply(msg, config.errors.connection)
 		return
@@ -30,7 +40,7 @@ local action = function(msg)
 		return
 	end
 	
-	local output =  '[boobs!](http://media.oboobs.ru/' .. jdat.preview .. ')'
+	local output =  '['..val..'s!](http://media.o'..val..'s.ru/' .. jdat.preview .. ')'
 
 	sendMessage(msg.chat.id, output, false, nil, true)
 
