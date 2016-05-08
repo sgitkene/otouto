@@ -5,7 +5,26 @@ Slap somebody.
 ```]]
 
 local triggers = {
-	'^/slap[@'..bot.username..']*'
+	'^/slap[@'..bot.username..']*',
+	'^/cuddle[@'..bot.username..']*'
+}
+
+local cuddles = {
+	'VICTIM was cuddled by VICTOR.',
+	'VICTIM feels loved in VICTOR\'s embrace.',
+	'VICTOR takes VICTIM into their arms.',
+	'VICTOR shows VICTIM their appreciation.',
+	'VICTOR holds VICTIM closely.',
+	'VICTIM got licked by VICTOR.',
+	'VICTIM can\'t escape VICTOR\'s love.',
+	'VICTOR won\'t let go of VICTIM.',
+	'VICTOR and VICTIM get into the same bed.',
+	'VICTOR and VICTIM are happy toghether.',
+	'VICTIM gets kissed by VICTOR.',
+	'VICTOR kisses VICTIM amiably.',
+	'VICTOR strokes VICTIM\'s fur.',
+	'VICTOR looks deeply into VICTIM\'s bright eyes.',
+	'VICTOR looks at VICTIM. VICTIM looks back. VICTOR blushes and looks away.'
 }
 
 local slaps = {
@@ -133,8 +152,13 @@ local action = function(msg)
 		victim = victor
 		victor = bot.first_name
 	end
+	local message
+	if msg.text_lower:match('cuddle') then
+		message = cuddles[math.random(#cuddles)]
+	else
+		message = slaps[math.random(#slaps)]
+	end
 
-	local message = slaps[math.random(#slaps)]
 	message = message:gsub('VICTIM', victim)
 	message = message:gsub('VICTOR', victor)
 
