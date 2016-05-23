@@ -10,7 +10,7 @@ Get your variable. If no variable provided, gives a list of available variables 
 ```]]
 
 local triggers = {
-	'^/get[@'..bot.username..']*'
+	'^/get[@'..bot.username..']*%s?'
 }
 
 local action = function(msg)

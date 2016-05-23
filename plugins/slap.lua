@@ -19,17 +19,22 @@ local cuddles = {
 	'VICTIM can\'t escape VICTOR\'s love.',
 	'VICTOR won\'t let go of VICTIM.',
 	'VICTOR and VICTIM get into the same bed.',
-	'VICTOR and VICTIM are happy toghether.',
+	'VICTOR and VICTIM are happy together.',
 	'VICTIM gets kissed by VICTOR.',
 	'VICTOR kisses VICTIM amiably.',
 	'VICTOR strokes VICTIM\'s fur.',
+	'VICTOR gifts VICTIM a box of delicious Swiss chocolates.',
+	'VICTOR asks VICTIM to be their valentine. They like to plan ahead.',
+	'VICTOR looks at VICTIM with a radiant smile.',
+	'VICTOR and VICTIM go to a concert together.',
+	'VICTOR kills VICTIM softly with their song.',
 	'VICTOR looks deeply into VICTIM\'s bright eyes.',
 	'VICTOR looks at VICTIM. VICTIM looks back. VICTOR blushes and looks away.',
 	'VICTOR floofs VICTIM with their soft fur.',
 	'VICTIM shudders as they get floofed softly.',
 	'VICTIM relaxes as they cuddle with VICTOR.',
-	'VICTIM can\'t get enough of VICTOR\'s cluddles.',
-	'VICTOR and VICTIM enjoy their time toghether.',
+	'VICTIM can\'t get enough of VICTOR\'s cuddles.',
+	'VICTOR and VICTIM enjoy their time together.',
 	'VICTIM has been overfloofed.'
 
 }
@@ -136,7 +141,9 @@ local slaps = {
 	'VICTIM fell out of the world',
 	'VICTIM is now only two dimensional.',
 	'VICTOR won\'t put up with VICTIM anymore.',
-	'VICTOR had their way with VICTIM.'
+	'VICTOR had their way with VICTIM.',
+	'VICTIM\'s name has been erased from the textbooks.',
+	'VICTIM went all-in and lost.'
 }
 
 local action = function(msg)
