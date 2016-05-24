@@ -128,8 +128,8 @@ Send /help to get started.
 		'shout.lua',
 		'patterns.lua',
 		-- Put new plugins above this line.
-		'help.lua',
-		'greetings.lua'
+		'help',
+		'greetings'
 	}
 
 }

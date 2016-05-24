@@ -1,90 +1,115 @@
-local command = 'wikipedia <query>'
-local doc = [[```
+local wikipedia = {}
+
+local HTTPS = require('ssl.https')
+local URL = require('socket.url')
+local JSON = require('dkjson')
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+wikipedia.command = 'wikipedia <query>'
+wikipedia.doc = [[```
 /wikipedia <query>
 Returns an article from Wikipedia.
 Aliases: /w, /wiki
 ```]]
 
-local triggers = {
-	'^/wikipedia[@'..bot.username..']*',
-	'^/wiki[@'..bot.username..']*',
-	'^/w[@'..bot.username..']*$',
-	'^/w[@'..bot.username..']* '
-}
+function wikipedia:init()
+	wikipedia.triggers = utilities.triggers(self.info.username):t('wikipedia', true):t('wiki', true):t('w', true).table
+end
 
-local action = function(msg)
+local get_title = function(search)
+	for i,v in ipairs(search) do
+		if not v.snippet:match('may refer to:') then
+			return v.title
+		end
+	end
+	return false
+end
 
-	local input = msg.text:input()
+function wikipedia:action(msg)
+
+	-- Get the query. If it's not in the message, check the replied-to message.
+	-- If those don't exist, send the help text.
+	local input = utilities.input(msg.text)
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, wikipedia.doc, true, msg.message_id, true)
 			return
 		end
 	end
 
-	local gurl = 'https://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=1&q=site:wikipedia.org%20'
-	local wurl = 'https://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exchars=4000&exsectionformat=plain&titles='
+	-- This kinda sucks, but whatever.
+	input = input:gsub('#', ' sharp')
 
-	local jstr, res = HTTPS.request(gurl .. URL.escape(input))
+	-- Disclaimer: These variables will be reused.
+	local jstr, res, jdat
+
+	-- All pretty standard from here.
+	local search_url = 'https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch='
+
+	jstr, res = HTTPS.request(search_url .. URL.escape(input))
 	if res ~= 200 then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
-	local jdat = JSON.decode(jstr)
-	if not jdat.responseData then
-		sendReply(msg, config.errors.connection)
-		return
-	end
-	if not jdat.responseData.results[1] then
-		sendReply(msg, config.errors.results)
+	jdat = JSON.decode(jstr)
+	if jdat.query.searchinfo.totalhits == 0 then
+		bindings.sendReply(self, msg, self.config.errors.results)
 		return
 	end
 
-	local url = jdat.responseData.results[1].unescapedUrl
-	local title = jdat.responseData.results[1].titleNoFormatting:gsub(' %- Wikipedia, the free encyclopedia', '')
+	local title = get_title(jdat.query.search)
+	if not title then
+		bindings.sendReply(self, msg, self.config.errors.results)
+		return
+	end
 
-	-- 'https://en.wikipedia.org/wiki/':len() == 30
-	jstr, res = HTTPS.request(wurl .. url:sub(31))
+	local res_url = 'https://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exchars=4000&exsectionformat=plain&titles='
+
+	jstr, res = HTTPS.request(res_url .. URL.escape(title))
 	if res ~= 200 then
-		sendReply(msg, config.error.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
+	local _
 	local text = JSON.decode(jstr).query.pages
-	for k,v in pairs(text) do
-		text = v.extract
-		break -- Seriously, there's probably a way more elegant solution.
-	end
+	_, text = next(text)
 	if not text then
-		sendReply(msg, config.errors.results)
+		bindings.sendReply(self, msg, self.config.errors.results)
 		return
+	else
+		text = text.extract
 	end
 
+	-- Remove needless bits from the article, take only the first paragraph.
 	text = text:gsub('</?.->', '')
 	local l = text:find('\n')
 	if l then
 		text = text:sub(1, l-1)
 	end
 
+	-- This block can be annoying to read.
+	-- We use the initial title to make the url for later use. Then we remove
+	-- the extra bits that won't be in the article. We determine whether the
+	-- first part of the text is the title, and if so, we embolden that.
+	-- Otherwise, we prepend the text with a bold title. Then we append a "Read
+	-- More" link.
+	local url = 'https://en.wikipedia.org/wiki/' .. URL.escape(title)
 	title = title:gsub('%(.+%)', '')
-	local esctitle = title:gsub("[%^$()%%.%[%]*+%-?]","%%%1")
-	local output = text:gsub('%[.+%]',''):gsub(esctitle, '*%1*') .. '\n'
-	if url:find('%(') then
-		output = output .. url:gsub('_', '\\_')
+	local output
+	if string.match(text:sub(1, title:len()), title) then
+		output = '*' .. title .. '*' .. text:sub(title:len()+1)
 	else
-		output = output .. '[Read more.](' .. url .. ')'
+		output = '*' .. title:gsub('%(.+%)', '') .. '*\n' .. text:gsub('%[.+%]','')
 	end
+	output = output .. '\n[Read more.](' .. url:gsub('%)', '\\)') .. ')'
 
-	sendMessage(msg.chat.id, output, true, nil, true)
+	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return wikipedia

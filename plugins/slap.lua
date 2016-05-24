@@ -1,13 +1,19 @@
-local command = 'slap [target]'
-local doc = [[```
+local slap = {}
+
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+slap.command = 'slap [target]'
+slap.doc = [[```
 /slap [target]
 Slap somebody.
 ```]]
 
-local triggers = {
-	'^/slap[@'..bot.username..']*',
-	'^/cuddle[@'..bot.username..']*'
-}
+<<<<<<< HEAD
+
+function slap:init()
+	slap.triggers = utilities.triggers(self.info.username):t('slap', true):t('cuddle', true).table
+end
 
 local cuddles = {
 	'VICTIM was cuddled by VICTOR.',
@@ -36,7 +42,6 @@ local cuddles = {
 	'VICTIM can\'t get enough of VICTOR\'s cuddles.',
 	'VICTOR and VICTIM enjoy their time together.',
 	'VICTIM has been overfloofed.'
-
 }
 
 local slaps = {
@@ -143,48 +148,43 @@ local slaps = {
 	'VICTOR won\'t put up with VICTIM anymore.',
 	'VICTOR had their way with VICTIM.',
 	'VICTIM\'s name has been erased from the textbooks.',
-	'VICTIM went all-in and lost.'
+	'VICTIM went all-in and lost.',
+	'VICTIM died of hospital gangrene.',
+	'VICTIM got a house call from Doctor VICTOR.',
+	'VICTOR beheaded VICTIM.',
+	'VICTIM got stoned...by an angry mob.',
+	'VICTOR sued the pants off VICTIM.',
+	'VICTIM was impeached.',
+	'VICTIM was one-hit KO\'d by VICTOR.',
+	'VICTOR sent VICTIM to /dev/null.',
+	'VICTOR sent VICTIM down the memory hole.'
 }
 
-local action = function(msg)
+local interactions = { "/slap" = slaps, "/cuddle" = cuddles}
 
-	local victim = msg.text:input()
-	if msg.reply_to_message then
-		if database.users[tostring(msg.reply_to_message.from.id)].nickname then
-			victim = database.users[tostring(msg.reply_to_message.from.id)].nickname
-		else
-			victim = msg.reply_to_message.from.first_name
-		end
+function slap:action(msg)
+
+	local victor = self.database.users[msg.from.id_str]
+	local victim = utilities.user_from_message(self, msg, true)
+	local input = utilities.input(msg.text)
+
+	local victim_name = victim.nickname or victim.first_name or input
+	local victor_name = victor.nickname or victor.first_name
+	if not victim_name or victim_name == victor_name then
+		victim_name = victor_name
+		victor_name = self.info.first_name
 	end
+	
+	
+	decidestring = msg.text:matches("^/cuddle") or msg.text:matches("^/slap")
+	local output = interactions[decidestring][random(#interactions[decidestring])]
+	output = output:gsub('VICTIM', victim_name)
+	output = output:gsub('VICTOR', victor_name)
+	output = utilities.char.zwnj .. output
 
-	local victor = msg.from.first_name
-	if database.users[msg.from.id_str].nickname then
-		victor = database.users[msg.from.id_str].nickname
-	end
 
-	if not victim then
-		victim = victor
-		victor = bot.first_name
-	end
-	local message
-	if msg.text_lower:match('cuddle') then
-		message = cuddles[math.random(#cuddles)]
-	else
-		message = slaps[math.random(#slaps)]
-	end
-
-	message = message:gsub('VICTIM', victim)
-	message = message:gsub('VICTOR', victor)
-
-	message = latcyr(message)
-
-	sendMessage(msg.chat.id, message)
+	bindings.sendMessage(self, msg.chat.id, output)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return slap
