@@ -10,7 +10,7 @@ Slap somebody.
 ```]]
 
 function slap:init()
-	slap.triggers = utilities.triggers(self.info.username):t('slap', true):t('cuddle', true).table
+	slap.triggers = utilities.triggers(self.info.username):t('slap', true):t('cuddle', true):t('dance', true):t('dwith', true).table
 end
 
 local cuddles = {
@@ -157,9 +157,28 @@ local slaps = {
 	'VICTOR sent VICTIM to /dev/null.',
 	'VICTOR sent VICTIM down the memory hole.'
 }
+
+local dances = {
+	'The whole club was looking at VICTIM. VICTIM hit the floor. Next thing you know, VICTIM got low, low, low, low, low, low, low, low.',
+	'VICTIM gets jiggy wit\' it!',
+	'VICTIM should go to military school, because they\'re one hell of a Soldja Boy!',
+	'VICTIM dances.',
+	'VICTIM dances ecstatically.',
+	'VICTIM knows how to pole dance like a pro!',
+	'VICTIM just whipped, and THEN nae-nae\'d!',
+	'VICTIM doesn\'t know how to dance but tries anyway.'
+}
+
+local pairdances = {
+	'VICTOR bids VICTIM to dance.',
+	'VICTOR rocks the dancefloor with VICTIM.'
+}
+
 local interactions= {}
 interactions['/slap'] = slaps
 interactions['/cuddle'] = cuddles
+interactions['/dance'] = dances
+interactions['/dwith'] = pairdances
 
 
 function slap:action(msg)
@@ -176,7 +195,7 @@ function slap:action(msg)
 	end
 	
 	
-	local decidestring = msg.text:match('^/cuddle') or msg.text:match('^/slap')
+	local decidestring = msg.text:match('^/cuddle') or msg.text:match('^/slap') or msg.text:match('^/dance') or msg.text:match('^/dwith')
 	local output = interactions[decidestring][math.random(#interactions[decidestring])]
 	--output = slaps[math.random(#slaps)]
 	output = output:gsub('VICTIM', victim_name)
