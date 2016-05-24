@@ -9,8 +9,6 @@ slap.doc = [[```
 Slap somebody.
 ```]]
 
-<<<<<<< HEAD
-
 function slap:init()
 	slap.triggers = utilities.triggers(self.info.username):t('slap', true):t('cuddle', true).table
 end
@@ -159,8 +157,10 @@ local slaps = {
 	'VICTOR sent VICTIM to /dev/null.',
 	'VICTOR sent VICTIM down the memory hole.'
 }
+local interactions= {}
+interactions['/slap'] = slaps
+interactions['/cuddle'] = cuddles
 
-local interactions = { "/slap" = slaps, "/cuddle" = cuddles}
 
 function slap:action(msg)
 
@@ -176,8 +176,9 @@ function slap:action(msg)
 	end
 	
 	
-	decidestring = msg.text:matches("^/cuddle") or msg.text:matches("^/slap")
-	local output = interactions[decidestring][random(#interactions[decidestring])]
+	local decidestring = msg.text:match('^/cuddle') or msg.text:match('^/slap')
+	local output = interactions[decidestring][math.random(#interactions[decidestring])]
+	--output = slaps[math.random(#slaps)]
 	output = output:gsub('VICTIM', victim_name)
 	output = output:gsub('VICTOR', victor_name)
 	output = utilities.char.zwnj .. output
