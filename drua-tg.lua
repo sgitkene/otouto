@@ -50,37 +50,37 @@ local drua = {
 }
 
 drua.send = function(command, do_receive)
-	command = command .. '\n'
-	local s = SOCKET.connect('localhost', 4567)
-	s:send(command)
+	local s = SOCKET.connect(drua.IP, drua.PORT)
+	assert(s, '\nUnable to connect to tg session.')
+	s:send(command..'\n')
+	local output
 	if do_receive then
-		-- Get the size of the output, and get the output.
-		-- Thanks Juan for making this so easy to read. :^)
-		local output = s:receive(tonumber(string.match(s:receive("*l"), "ANSWER (%d+)")))
-		s:close()
-		return output:gsub('\n$', '')
+		output = string.match(s:receive('*l'), 'ANSWER (%d+)')
+		output = s:receive(tonumber(output)):gsub('\n$', '')
 	end
 	s:close()
+	return output
 end
 
 drua.message = function(target, text)
-	local target = format_target(target)
-	local text = escape(text)
+	target = format_target(target)
+	text = escape(text)
 	local command = 'msg %s "%s"'
 	command = command:format(target, text)
 	return drua.send(command)
 end
 
 drua.send_photo = function(target, photo)
-	local target = format_target(target)
+	target = format_target(target)
 	local command = 'send_photo %s %s'
 	command = command:format(target, photo)
 	return drua.send(command)
 end
 
 drua.add_user = function(chat, target)
-	local chat,a = format_target(chat)
-	local target = format_target(target)
+	local a
+	chat, a = format_target(chat)
+	target = format_target(target)
 	local command = comtab.add[a]:format(chat, target)
 	return drua.send(command)
 end
@@ -88,55 +88,64 @@ end
 drua.kick_user = function(chat, target)
 	-- Get the group info so tg will recognize the target.
 	drua.get_info(chat)
-	local chat,a = format_target(chat)
-	local target = format_target(target)
+	local a
+	chat, a = format_target(chat)
+	target = format_target(target)
 	local command = comtab.kick[a]:format(chat, target)
 	return drua.send(command)
 end
 
 drua.rename_chat = function(chat, name)
-	local chat,a = format_target(chat)
+	local a
+	chat, a = format_target(chat)
 	local command = comtab.rename[a]:format(chat, name)
 	return drua.send(command)
 end
 
 drua.export_link = function(chat)
-	local chat,a = format_target(chat)
+	local a
+	chat, a = format_target(chat)
 	local command = comtab.link[a]:format(chat)
 	return drua.send(command, true)
 end
 
 drua.get_photo = function(chat)
-	local chat,a = format_target(chat)
+	local a
+	chat, a = format_target(chat)
 	local command = comtab.photo_get[a]:format(chat)
 	local output = drua.send(command, true)
-	if output:match('FAIL') then return false end
-	return output:match('Saved to (.+)')
+	if output:match('FAIL') then
+		return false
+	else
+		return output:match('Saved to (.+)')
+	end
 end
 
 drua.set_photo = function(chat, photo)
-	local chat,a = format_target(chat)
+	local a
+	chat, a = format_target(chat)
 	local command = comtab.photo_set[a]:format(chat, photo)
 	return drua.send(command)
 end
 
 drua.get_info = function(target)
-	local target,a = format_target(target)
+	local a
+	target, a = format_target(target)
 	local command = comtab.info[a]:format(target)
 	return drua.send(command, true)
 end
 
 drua.channel_set_admin = function(chat, user, rank)
-	local chat = format_target(chat)
-	local user = format_target(user)
+	chat = format_target(chat)
+	user = format_target(user)
 	local command = 'channel_set_admin %s %s %s'
 	command = command:format(chat, user, rank)
 	return drua.send(command)
 end
 
 drua.channel_set_about = function(chat, text)
-	local chat = format_target(chat)
-	local text = escape(text)
+	chat = format_target(chat)
+	text = escape(text)
 	local command = 'channel_set_about %s "%s"'
 	command = command:format(chat, text)
 	return drua.send(command)

@@ -1,10 +1,4 @@
-plugins/mokubot*
-plugins/qtbot*
-plugins/mjolnir*
-plugins/antisquigbot*
-profile-pictures
+otouto/plugins/mokubot*
 *.db
-lua-tg
-drua-tg
 tg
 config.lua

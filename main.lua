@@ -1,5 +1,6 @@
-local bot = require('bot')
+local bot = require('otouto.bot')
 
 local instance = {}
+local config = require('config')
 
-return bot.run(instance)
+return bot.run(instance, config)

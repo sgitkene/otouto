@@ -35,7 +35,11 @@ I am otouto, the plugin-wielding, multipurpose Telegram bot.
 
 Send /help to get started.
 	]],
+	-- The symbol that starts a command. Usually noted as '/' in documentation.
+	cmd_pat = '/',
 
+	-- https://datamarket.azure.com/dataset/bing/search
+	bing_api_key = '',
 	-- http://last.fm/api
 	-- http://api.biblia.com
 	-- http://thecatapi.com/docs.html
@@ -98,20 +102,15 @@ Send /help to get started.
 		'whoami',
 		'nick',
 		'echo',
---		'set',
---		'get',
 		'setandget',
 --		'pr0',
 --		'rule34',
 --		'dogify',
+		'boobs',
 		'newline',
---		'gSearch',
---		'gMaps',
 		'wikipedia',
 		'hackernews',
 		'calc',
---		'yoda',
-		'boobs',
 		'lastfm',
 		'urbandictionary',
 		'time',
@@ -120,16 +119,12 @@ Send /help to get started.
 		'reddit',
 		'xkcd',
 		'slap',
---		'dance',
 		'commit',
 		'pun',
 		'currency',
 		'cats',
---		'hearthstone',
---		'newline',
 		'reactions',
 		'shout',
-		'patterns',
 		-- Put new plugins above this line.
 		'help',
 		'greetings'
