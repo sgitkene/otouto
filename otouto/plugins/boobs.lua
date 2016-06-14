@@ -1,14 +1,15 @@
 local boobs = {}
 
-local bindings = require('bindings')
-local utilities = require('utilities')
+local URL = require('socket.url')
+local bindings = require('otouto.bindings')
+local utilities = require('otouto.utilities')
 local JSON = require('dkjson')
 local HTTP = require('socket.http')
 
 
 
-function boobs:init()
-	boobs.triggers = utilities.triggers(self.info.username):t('boobs', true):t('butts', true):t('bo', true):t('bu', true).table
+function boobs:init(config)
+	boobs.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('boobs', true):t('butts', true):t('bo', true):t('bu', true).table
 end
 
 boobs.command = 'boobs'
