@@ -1,9 +1,8 @@
 local newline = {}
-local bindings = require('bindings')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
-function newline:init()
-	newline.triggers = utilities.triggers(self.info.username):t('n', true).table
+function newline:init(config)
+	newline.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('n', true).table
 end
 
 function newline:action(msg)
