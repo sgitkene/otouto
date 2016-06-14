@@ -5,17 +5,11 @@ local utilities = require('otouto.utilities')
 slap.command = 'slap [target]'
 
 function slap:init(config)
-	slap.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('slap', true).table
+	slap.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('slap', true):t('cuddle', true):t('dance', true):t('dwith', true).table
 	slap.doc = [[```
 ]]..config.cmd_pat..[[slap [target]
 Slap somebody.
 ```]]
-<<<<<<< HEAD:plugins/slap.lua
-
-function slap:init()
-	slap.triggers = utilities.triggers(self.info.username):t('slap', true):t('cuddle', true):t('dance', true):t('dwith', true).table
-=======
->>>>>>> 31a8e220ac5dbc8b0062891ab78813d90ebdf5ba:otouto/plugins/slap.lua
 end
 
 local cuddles = {
@@ -44,7 +38,12 @@ local cuddles = {
 	'VICTIM relaxes as they cuddle with VICTOR.',
 	'VICTIM can\'t get enough of VICTOR\'s cuddles.',
 	'VICTOR and VICTIM enjoy their time together.',
-	'VICTIM has been overfloofed.'
+	'VICTIM has been overfloofed.',
+	'VICTOR\'s cuddle was all VICTIM needed.',
+	'VICTIM melts in VICTOR\'s embrace.',
+	'VICTOR professionally cuddles VICTIM.',
+	'VICTOR massages VICTIM\'s back.',
+	'VICTIM swoons in VICTOR\'s embrace.'
 }
 
 local slaps = {
@@ -179,7 +178,7 @@ local pairdances = {
 	'VICTOR rocks the dancefloor with VICTIM.'
 }
 
-local interactions= {}
+local interactions = {}
 interactions['/slap'] = slaps
 interactions['/cuddle'] = cuddles
 interactions['/dance'] = dances
@@ -207,12 +206,7 @@ function slap:action(msg)
 	output = output:gsub('VICTOR', victor_name)
 	output = utilities.char.zwnj .. output
 
-<<<<<<< HEAD:plugins/slap.lua
-
-	bindings.sendMessage(self, msg.chat.id, output)
-=======
 	utilities.send_message(self, msg.chat.id, output)
->>>>>>> 31a8e220ac5dbc8b0062891ab78813d90ebdf5ba:otouto/plugins/slap.lua
 
 end
 
