@@ -1,35 +1,35 @@
-local command = 'dogify <text>'
-local doc = [[```
+local dogify = {}
+
+local utilities = require('otouto.utilities')
+
+dogify.command = 'dogify <text>'
+dogify.doc = [[```
 /dogify <such text/wow>
 Wow, much return, such text, wow.
 ```]]
 
-local triggers = {
-	'^/dogify[@'..bot.username..']*'
-}
+function dogify:init(config)
+	dogify.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('dogify', true).table
+end
 
-local action = function(msg)
-	local base_url = 'http://dogr.io/'
-	local input = msg.text:input()
+dogify.base_url = 'http://dogr.io/'
+
+function dogify:action(msg, config)
+	local input = utilities.input(msg.text)
 	local urlm = 'https?://[%%%w-_%.%?%.:/%+=&]+'
+	local output = ''
 	if not input then
-		output = doc
+		output = dogify.doc
 	else
 		input = input:gsub(' ', '%%20')
-		url = base_url..input..'.png?split=false&.png'
+		url = dogify.base_url..input..'.png?split=false&.png'
 		if string.match(url, urlm) == url then
 			output = '[WOW!]('..url..')'
 		else
 			output = config.errors.argument
 		end
 	end
-	sendMessage(msg.chat.id, output, false, nil, true)
+	utilities.send_message(self, msg.chat.id, output, false, nil, true)
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
-		
+return dogify
