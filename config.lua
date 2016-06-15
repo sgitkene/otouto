@@ -106,7 +106,7 @@ Send /help to get started.
 		'setandget',
 --		'pr0',
 --		'rule34',
---		'dogify',
+		'dogify',
 		'boobs',
 		'newline',
 		'wikipedia',

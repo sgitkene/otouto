@@ -43,6 +43,9 @@ local cuddles = {
 	'VICTIM melts in VICTOR\'s embrace.',
 	'VICTOR professionally cuddles VICTIM.',
 	'VICTOR massages VICTIM\'s back.',
+	'VICTOR snoozles up to VICTIM',
+	'VICTOR lies their sleepy head on VICTIM\'s warm stomach',
+	'VICTOR wraps their arms around VICTIM',
 	'VICTIM swoons in VICTOR\'s embrace.'
 }
 
