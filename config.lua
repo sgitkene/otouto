@@ -47,7 +47,8 @@ Send /help to get started.
 	-- http://tech.yandex.com/keys/get
 	-- http://developer.simsimi.com/signUp
 
-	errors = { -- Generic error messages used in various plugins.
+	errors = { -- Generic error messages.
+		generic = 'An unexpected error occurred.',
 		connection = 'Connection error.',
 		results = 'No results found.',
 		argument = 'Invalid argument.',
