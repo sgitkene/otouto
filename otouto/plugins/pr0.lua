@@ -1,23 +1,26 @@
 -- rewrite of pr0.lua that I tried to port from yagop's bot to otouto.
-local command = 'pr0gramm'
-local doc = [[```
+local pr0 = {}
+local utilities = require('otouto.utilities')
+local HTTP = require('socket.http')
+local JSON = require('dkjson')
+pr0.command = 'pr0gramm'
+pr0.doc = [[```
 /pr0gramm [filter] [tag]
 Returns a pr0gramm.com image conforming to given filter and tag. If none are given, returns a random image.
 Alias: /pr0
 ```]]
 
-local triggers = {
-	'^/pr0gramm[@'..bot.username..']*',
-	'^/pr0[@'..bot.username..']*$',
-	'^/pr0[@'..bot.username..']* '
-}
+function pr0:init(config)
+	pr0.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('pr0', true):t('pr0gramm', true).table
+end
 
-local action = function(msg)
+
+function pr0:action(msg, config)
 	-- find out filter and tag, then query the api accordingly.
 	-- send the found link formatted [pr0](link) with link preview or, in case of webm or gif, send as file.
 	local tag = '&tags='
 	local flag = '&flags='
-	local text = msg.text:input()
+	local text = utilities.input(msg.text)
 	local urlapi = 'http://pr0gramm.com/api/items/get?promoted=1'
 	local answer = nil
 	local status = 0
@@ -68,13 +71,7 @@ local action = function(msg)
 			end
 		end
 	end
-	sendMessage(msg.chat.id, output, false, nil, true)
+	utilities.send_message(self, msg.chat.id, output, false, nil, true)
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
-	
+return pr0
