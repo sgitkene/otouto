@@ -202,7 +202,7 @@ function slap:action(msg)
 	end
 	
 	
-	local decidestring = msg.text:match('^/cuddle') or msg.text:match('^/slap') or msg.text:match('^/dance') or msg.text:match('^/dwith')
+	local decidestring = msg.text_lower:match('^/cuddle') or msg.text_lower:match('^/slap') or msg.text_lower:match('^/dance') or msg.text_lower:match('^/dwith')
 	local output = interactions[decidestring][math.random(#interactions[decidestring])]
 	--output = slaps[math.random(#slaps)]
 	output = output:gsub('VICTIM', victim_name)

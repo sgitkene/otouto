@@ -1,7 +1,6 @@
 local boobs = {}
 
 local URL = require('socket.url')
-local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 local JSON = require('dkjson')
 local HTTP = require('socket.http')
@@ -33,24 +32,24 @@ function boobs:action(msg)
 	end
 	local jstr, status = HTTP.request('http://api.o'..val..'s.ru/noise/1')
 	if status ~= 200 then
-		bindings.sendReply(self, msg, config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)[1]
 	if not jdat then
-		bindings.sendReply(self, msg, config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 
 	if jdat.error then
-		bindings.sendReply(self, msg, 'jdat error')
+		utilities.send_reply(self, msg, 'jdat error')
 		return
 	end
 	
 	local output =  '['..val..'s!](http://media.o'..val..'s.ru/' .. jdat.preview .. ')'
 
-	bindings.sendMessage(self, msg.chat.id, output, false, nil, true)
+	utilities.send_message(self, msg.chat.id, output, false, nil, true)
 
 end
 
