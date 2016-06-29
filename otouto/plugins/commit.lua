@@ -19,6 +19,7 @@ local commits = {
 	"Some shit.",
 	"add actual words",
 	"I CAN HAZ COMMENTZ.",
+	"TODOOT: Thank mr skeltal",
 	"giggle.",
 	"Whatever.",
 	"Finished fondling.",
